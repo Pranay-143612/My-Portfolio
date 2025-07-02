@@ -138,13 +138,7 @@ const Hero: React.FC = () => {
             className="h-96 lg:h-[500px]"
           >
             <Canvas
-              onPointerDown={(e) => {
-                if (e.pointerType === 'mouse') {
-                  setIsSphereClicked(true);
-                }
-              }}
             >
-
               <Suspense fallback={null}>
                 <OrbitControls enableZoom={false} enabled={isSphereClicked} />
                 <ambientLight intensity={1} />
