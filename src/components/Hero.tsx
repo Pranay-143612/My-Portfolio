@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Sphere, MeshDistortMaterial } from '@react-three/drei';
@@ -19,6 +19,16 @@ const AnimatedSphere: React.FC = () => {
 };
 
 const Hero: React.FC = () => {
+  const [isSphereClicked, setIsSphereClicked] = useState(false);
+
+  // Optional: auto-disable OrbitControls after 5 seconds
+  useEffect(() => {
+    if (isSphereClicked) {
+      const timer = setTimeout(() => setIsSphereClicked(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [isSphereClicked]);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -50,6 +60,7 @@ const Hero: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Text Section */}
           <motion.div
             variants={containerVariants}
             initial="hidden"
@@ -119,15 +130,16 @@ const Hero: React.FC = () => {
             </motion.div>
           </motion.div>
 
+          {/* 3D Sphere Section */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.5 }}
             className="h-96 lg:h-[500px]"
           >
-            <Canvas>
+            <Canvas onPointerDown={() => setIsSphereClicked(true)}>
               <Suspense fallback={null}>
-                <OrbitControls enableZoom={false} />
+                <OrbitControls enableZoom={false} enabled={isSphereClicked} />
                 <ambientLight intensity={1} />
                 <directionalLight position={[3, 2, 1]} />
                 <AnimatedSphere />
