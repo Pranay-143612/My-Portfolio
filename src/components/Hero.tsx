@@ -21,7 +21,7 @@ const AnimatedSphere: React.FC = () => {
 const Hero: React.FC = () => {
   const [isSphereClicked, setIsSphereClicked] = useState(false);
 
-  // Optional: auto-disable OrbitControls after 5 seconds
+  // Auto-disable orbit controls after 5 seconds
   useEffect(() => {
     if (isSphereClicked) {
       const timer = setTimeout(() => setIsSphereClicked(false), 5000);
@@ -60,6 +60,7 @@ const Hero: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
           {/* Text Section */}
           <motion.div
             variants={containerVariants}
@@ -136,9 +137,13 @@ const Hero: React.FC = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.5 }}
             className="h-96 lg:h-[500px]"
+            onPointerDown={(e) => {
+              if (e.pointerType === 'mouse') {
+                setIsSphereClicked(true);
+              }
+            }}
           >
-            <Canvas
-            >
+            <Canvas style={{ touchAction: 'pan-y' }}>
               <Suspense fallback={null}>
                 <OrbitControls enableZoom={false} enabled={isSphereClicked} />
                 <ambientLight intensity={1} />
