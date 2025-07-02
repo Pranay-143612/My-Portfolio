@@ -20,8 +20,15 @@ const AnimatedSphere: React.FC = () => {
 
 const Hero: React.FC = () => {
   const [isSphereClicked, setIsSphereClicked] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Auto-disable orbit controls after 5 seconds
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   useEffect(() => {
     if (isSphereClicked) {
       const timer = setTimeout(() => setIsSphereClicked(false), 5000);
@@ -45,9 +52,7 @@ const Hero: React.FC = () => {
     visible: {
       y: 0,
       opacity: 1,
-      transition: {
-        duration: 0.5,
-      },
+      transition: { duration: 0.5 },
     },
   };
 
@@ -60,7 +65,6 @@ const Hero: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-
           {/* Text Section */}
           <motion.div
             variants={containerVariants}
@@ -131,19 +135,24 @@ const Hero: React.FC = () => {
             </motion.div>
           </motion.div>
 
-          {/* 3D Sphere Section */}
+          {/* Sphere Section */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.5 }}
             className="h-96 lg:h-[500px]"
             onPointerDown={(e) => {
-              if (e.pointerType === 'mouse') {
+              if (e.pointerType === 'mouse' && !isMobile) {
                 setIsSphereClicked(true);
               }
             }}
           >
-            <Canvas style={{ touchAction: 'pan-y' }}>
+            <Canvas
+              style={{
+                pointerEvents: isMobile ? 'none' : 'auto',
+                touchAction: 'none',
+              }}
+            >
               <Suspense fallback={null}>
                 <OrbitControls enableZoom={false} enabled={isSphereClicked} />
                 <ambientLight intensity={1} />
@@ -155,16 +164,13 @@ const Hero: React.FC = () => {
         </div>
       </div>
 
-      {/* Floating particles */}
+      {/* Floating Particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(20)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-2 h-2 bg-blue-400 rounded-full opacity-20"
-            animate={{
-              x: [0, 100, 0],
-              y: [0, -100, 0],
-            }}
+            animate={{ x: [0, 100, 0], y: [0, -100, 0] }}
             transition={{
               duration: Math.random() * 10 + 10,
               repeat: Infinity,
